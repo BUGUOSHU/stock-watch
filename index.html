@@ -1,0 +1,136 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#f4f6f2">
+  <meta name="description" content="每日美股简报：关注个股消息、行业动向、宏观数据和事件倒计时。">
+  <title>每日美股简报</title>
+  <style>
+    :root{color-scheme:light;--ink:#19241f;--muted:#6e7b73;--line:#e3e9e3;--paper:#fff;--bg:#f4f6f2;--green:#176b52;--soft:#eaf3ee;--red:#a9473e;--amber:#96631c}
+    *{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.55 Inter,ui-sans-serif,system-ui,-apple-system,"Segoe UI",sans-serif}a{color:inherit}button{font:inherit;cursor:pointer}
+    .shell{max-width:1060px;padding:25px 22px 55px;margin:auto}header{display:flex;justify-content:space-between;align-items:center;gap:16px;margin-bottom:24px}.brand{display:flex;align-items:center;gap:11px}.mark{width:37px;height:37px;border-radius:12px;background:var(--green);color:white;display:grid;place-items:center;font-weight:800;font-size:12px}h1{font-size:18px;line-height:1.2;margin:0}.subtitle{font-size:12px;color:var(--muted);margin-top:3px}.header-actions{display:flex;gap:8px}.btn{background:white;border:1px solid var(--line);border-radius:9px;padding:8px 12px;text-decoration:none;font-size:12px;font-weight:650;color:var(--ink)}.btn:hover{border-color:#aebeb3}.btn.primary{background:var(--green);color:white;border-color:var(--green)}
+    .hero{display:flex;justify-content:space-between;align-items:end;gap:14px;margin:25px 0 13px}.eyebrow{font-size:10px;letter-spacing:1.5px;text-transform:uppercase;color:var(--green);font-weight:750}h2{font-size:27px;line-height:1.2;letter-spacing:-.7px;margin:4px 0 0}.asof{color:var(--muted);font-size:12px;text-align:right}.panel{background:var(--paper);border:1px solid var(--line);border-radius:15px;padding:17px 19px;box-shadow:0 3px 14px #18332408}.market{padding:0 14px;overflow:hidden;min-height:70px}.ticker{width:100%}.section{margin-top:13px}.section-head{display:flex;justify-content:space-between;align-items:baseline;gap:12px;margin-bottom:10px}.section-title{font-weight:750;font-size:15px;margin:0}.hint{color:var(--muted);font-size:11px}.events{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:9px}.event{border:1px solid var(--line);border-radius:11px;padding:11px 12px;min-width:0}.event .days{font-size:11px;color:var(--green);font-weight:750}.event .name{font-size:13px;font-weight:700;margin-top:2px}.event .date{font-size:11px;color:var(--muted)}.layout{display:grid;grid-template-columns:1fr 1fr;gap:13px;margin-top:13px}.brief p{margin:8px 0;color:#48564d;font-size:13px}.brief strong{color:var(--ink)}.list{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}.stock{border:1px solid var(--line);border-radius:10px;padding:10px 11px;min-width:0}.stock-top{display:flex;justify-content:space-between;gap:6px;align-items:baseline}.stock b{font-size:13px}.stock span{font-size:11px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.stock a{display:inline-block;margin-top:4px;font-size:10px;color:var(--green);text-decoration:none}.news-list{display:grid;grid-template-columns:1fr 1fr;gap:0 18px}.news-item{padding:11px 0;border-bottom:1px solid var(--line);min-width:0}.news-item a{font-size:13px;line-height:1.4;font-weight:680;text-decoration:none}.news-item a:hover{color:var(--green)}.news-item p{font-size:11px;color:#59675e;margin:5px 0 0}.news-meta{font-size:10px;color:var(--muted);margin-top:5px}.empty{padding:18px 12px;border:1px dashed #d1dbd3;border-radius:10px;color:var(--muted);font-size:12px;text-align:center}.disclosure{font-size:10px;line-height:1.6;color:var(--muted);margin-top:16px}.toast{position:fixed;bottom:20px;left:50%;transform:translate(-50%,18px);opacity:0;background:#17231f;color:#fff;padding:9px 13px;border-radius:8px;font-size:12px;transition:.2s;pointer-events:none}.toast.show{opacity:1;transform:translate(-50%,0)}
+    .stock p{font-size:11px;line-height:1.45;color:#59675e;margin:5px 0 0}.stock-tools{display:flex;align-items:center;gap:7px;margin:10px 0 11px}.stock-tools input{min-width:0;flex:1;border:1px solid var(--line);border-radius:9px;padding:8px 10px;font:inherit;font-size:12px}.remove-stock{border:0;background:transparent;color:var(--muted);font-size:11px;padding:3px}.remove-stock:hover{color:var(--red)}
+    .ledger-form{display:grid;grid-template-columns:1.1fr .8fr 1fr 1fr 1fr 1fr auto;gap:8px;align-items:end}.field label{display:block;font-size:10px;color:var(--muted);margin:0 0 4px}.field input,.field select{width:100%;min-width:0;border:1px solid var(--line);border-radius:8px;padding:8px 9px;font:inherit;font-size:12px;background:white;color:var(--ink)}.ledger-summary{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px;margin:13px 0}.metric{padding:10px 12px;background:#f7f9f6;border-radius:9px}.metric span{display:block;font-size:10px;color:var(--muted)}.metric b{display:block;font-size:15px;margin-top:2px}.ledger-grid{display:grid;grid-template-columns:.9fr 1.4fr;gap:13px;margin-top:13px}.ledger-table-wrap{overflow:auto}.ledger-table{width:100%;border-collapse:collapse;font-size:11px;white-space:nowrap}.ledger-table th,.ledger-table td{text-align:left;padding:8px 7px;border-bottom:1px solid var(--line)}.ledger-table th{color:var(--muted);font-weight:650}.ledger-table td:last-child{text-align:right}.ledger-table .buy{color:var(--green);font-weight:700}.ledger-table .sell{color:var(--red);font-weight:700}.ledger-table button{border:0;background:none;color:var(--muted);font-size:10px;padding:3px}.ledger-empty{padding:18px 8px;color:var(--muted);text-align:center;font-size:12px}.ledger-note{margin:8px 0 0;font-size:10px;color:var(--muted)}
+    @media(max-width:760px){.shell{padding:18px 14px 38px}header{align-items:flex-start}.header-actions{flex-direction:column}.hero{align-items:flex-start;flex-direction:column;gap:4px}h2{font-size:23px}.asof{text-align:left}.events{grid-template-columns:repeat(2,minmax(0,1fr))}.layout,.ledger-grid{grid-template-columns:1fr}.list{grid-template-columns:repeat(2,minmax(0,1fr))}.news-list{grid-template-columns:1fr}.ledger-form{grid-template-columns:repeat(2,minmax(0,1fr))}.ledger-form .btn{grid-column:1/-1}.ledger-summary{grid-template-columns:repeat(2,minmax(0,1fr))}.panel{padding:15px}}
+  </style>
+  <script type="module" src="https://www.tradingview-widget.com/w/en/tv-ticker-tape.js"></script>
+</head>
+<body>
+<main class="shell">
+  <header>
+    <div class="brand"><div class="mark">美股</div><div><h1>每日美股简报</h1><div class="subtitle">个股 · 行业 · 宏观 · 持仓记录</div></div></div>
+    <div class="header-actions"><a class="btn" href="https://www.interactivebrokers.com/en/trading/client-portal.php" target="_blank" rel="noopener">打开 IBKR</a><button class="btn" id="share">分享网页</button><button class="btn primary" id="refresh">刷新</button></div>
+  </header>
+  <div class="hero"><div><div class="eyebrow">Daily market brief</div><h2>今天的持仓观察</h2></div><div class="asof" id="asof">更新中…</div></div>
+  <section class="panel market" aria-label="市场行情"><div id="tape" class="ticker"></div></section>
+
+  <section class="panel section">
+    <div class="section-head"><div><h3 class="section-title">持仓相关行业</h3><span class="hint">ETF 涨跌作同类板块参考，不等同于个股表现</span></div></div>
+    <div id="industry-tape" class="ticker"></div>
+    <div class="hint" style="margin-top:5px">SOXX 半导体设备/芯片 · IGV 云软件 · DRIV 电动车与自动驾驶 · XLF 金融 · XLB 原材料 · XLV 医疗保健</div>
+  </section>
+
+  <section class="panel section">
+    <div class="section-head"><h3 class="section-title">未来事件</h3><span class="hint">按日历日自动倒计时；日期以公司公告为准</span></div>
+    <div id="events" class="events"></div>
+  </section>
+
+  <section class="panel section" id="portfolio">
+    <div class="section-head"><div><h3 class="section-title">我的持仓记录</h3><div class="hint">记录买入和卖出，自动计算持仓、平均成本与已实现盈亏</div></div><span class="hint">仅保存在当前浏览器</span></div>
+    <form class="ledger-form" id="ledger-form">
+      <div class="field"><label for="ledger-ticker">股票代码</label><input id="ledger-ticker" list="ledger-ticker-options" placeholder="TSLA" required autocomplete="off"><datalist id="ledger-ticker-options"></datalist></div>
+      <div class="field"><label for="ledger-side">交易</label><select id="ledger-side"><option value="BUY">买入</option><option value="SELL">卖出</option></select></div>
+      <div class="field"><label for="ledger-qty">股数</label><input id="ledger-qty" type="number" min="0.000001" step="any" placeholder="股数" required></div>
+      <div class="field"><label for="ledger-price">成交价 (USD)</label><input id="ledger-price" type="number" min="0.000001" step="any" placeholder="每股价格" required></div>
+      <div class="field"><label for="ledger-fee">手续费 (USD)</label><input id="ledger-fee" type="number" min="0" step="any" value="0"></div>
+      <div class="field"><label for="ledger-date">交易日期</label><input id="ledger-date" type="date" required></div>
+      <button class="btn primary" type="submit">记一笔</button>
+    </form>
+    <div id="ledger-summary" class="ledger-summary"></div>
+    <div class="ledger-grid">
+      <section><div class="section-head"><h4 class="section-title">持仓概览</h4></div><div id="ledger-holdings"></div></section>
+      <section><div class="section-head"><h4 class="section-title">交易历史</h4><span id="ledger-count" class="hint"></span></div><div class="ledger-table-wrap" id="ledger-history"></div></section>
+    </div>
+    <p class="ledger-note">按加权平均成本计算已实现盈亏；买入手续费计入成本，卖出手续费从收入扣除。未计税费及汇率影响。记录不会进入分享链接，也不会发送给行情或新闻服务。</p>
+  </section>
+
+  <div class="layout">
+    <section class="panel brief">
+      <div class="section-head"><h3 class="section-title">宏观与行业</h3><span class="hint">首份简报 · 2026/10/16</span></div>
+      <p><strong>通胀：</strong>美国 9 月 CPI 同比上涨 3.7%；PPI 环比上涨 1.3%，高于预期。若通胀持续偏高，利率预期可能对高估值科技、金融及资本开支敏感型公司形成压力。</p>
+      <p><strong>利率与市场：</strong>通胀数据曾触发美股回落；随后交易日市场反弹，10 年期美债收益率回落至约 5.09%。关注后续通胀、就业数据及美联储政策表态。</p>
+      <p><strong>行业：</strong>AI 数据中心与高速互连需求支撑半导体设备、光通信和先进封装链条；短期仍受美债收益率、供应链和科技资本开支预期影响。地缘政治、能源价格与中美科技政策如有显著新变化，将纳入后续简报。</p>
+    </section>
+    <section class="panel">
+      <div class="section-head"><h3 class="section-title">持仓个股速览</h3><span class="hint">首报摘要 · 2026/10/16</span></div>
+      <div class="stock-tools"><input id="add-symbols" placeholder="输入代码，如 AAPL, NYSE:IBM" aria-label="添加股票代码"><button class="btn primary" id="add-symbols-button">添加</button></div>
+      <div class="hint" style="margin:-5px 0 10px">新增代码会同步加入行情、新闻和分享链接；最多 20 只。</div>
+      <div id="stocks" class="list"></div>
+    </section>
+  </div>
+
+  <section class="panel section">
+    <div class="section-head"><div><h3 class="section-title">个股最新消息</h3><div class="hint">自动抓取公开新闻并翻译为简体中文；点击标题查看原文</div></div><span class="hint" id="news-status"></span></div>
+    <div id="news" class="news-list"><div class="empty" style="grid-column:1/-1">正在获取新闻…</div></div>
+  </section>
+  <p class="disclosure">行情和新闻由公开第三方来源提供，可能延迟、遗漏或存在翻译偏差；美股盘前时以最近一个交易时段为准。页面信息不构成投资建议。交易前请在 IBKR 核对报价、市场状态和订单详情。当前首份宏观简报固定为 2026 年 10 月 16 日；自动任务会在本对话生成每日简报，网页新闻和倒计时独立更新。</p>
+</main>
+<div class="toast" id="toast" role="status"></div>
+<script>
+  const defaultStocks=[
+    ['TSLA','特斯拉','NASDAQ'],['ORCL','甲骨文','NYSE'],['KLAC','科磊','NASDAQ'],['LRCX','拉姆研究','NASDAQ'],
+    ['CRDO','Credo','NASDAQ'],['COHR','Coherent','NASDAQ'],['AMKR','Amkor','NASDAQ'],['SOFI','SoFi','NASDAQ'],
+    ['PONY','小马智行','NASDAQ'],['SOUN','SoundHound','NASDAQ'],['DOW','陶氏化学','NYSE'],['NVO','诺和诺德','NYSE']
+  ];
+  function parseStock(raw){const m=raw.trim().toUpperCase().match(/^(?:(NASDAQ|NYSE|AMEX):)?([A-Z][A-Z0-9.\-]{0,9})$/);return m?{ticker:m[2],name:m[2],exchange:m[1]||'NASDAQ'}:null}
+  const params=new URLSearchParams(location.search);
+  let customStocks=[...new Map((params.get('extra')||'').split(',').map(parseStock).filter(Boolean).map(s=>[s.ticker,s])).values()].slice(0,8);
+  let stocks=[...defaultStocks,...customStocks].slice(0,20);
+  const snapshots={TSLA:'三季度交付 486,532 辆；10/21 公布财报。',ORCL:'一季度云收入同比 +62%；云基建增长强，资本开支仍需关注。',KLAC:'近期随半导体设备板块回落；10/28 财报。',LRCX:'半导体设备板块短线承压；10/21 财报电话会。',CRDO:'近期发布面向 AI 网络的 1.6T 光互连产品及相关技术进展。',COHR:'上一财年 Q4 收入同比 +34%；公司称 AI/数据中心需求强劲。',AMKR:'Q2 销售额创纪录；亚利桑那先进封装扩建带来增长与投资执行压力。',SOFI:'稳定币结算服务接入 Mastercard 网络；10/27 财报。',PONY:'Q2 收入同比 +68.8%，Robotaxi 服务收入同比 +691.2%；下次活动日期待公布。',SOUN:'10/18–21 将展示金融服务 AI 代理；财报日期待公司确认。',DOW:'宣布每股 0.35 美元股息；10/22 公布 Q3 财报。',NVO:'近期更新 denecimig 美国申报进展；暂无已确认的下一场财报日期。'};
+  // Only dates confirmed in issuer/official event pages are shown.
+  const events=[
+    ['Money20/20','会议开始 · SoundHound 展示 AI 金融代理','2026-10-18'],
+    ['TSLA','第三季度财报','2026-10-21'],['LRCX','季度财报电话会','2026-10-21'],['DOW','第三季度财报','2026-10-22'],
+    ['AMKR','第三季度财报','2026-10-26'],['SOFI','第三季度财报','2026-10-27'],['KLAC','季度财报电话会','2026-10-28'],['COHR','FY2027 第一季度财报','2026-11-04'],['ORCL','FY2027 第二季度财报','2026-12-14']
+  ];
+  const fmtDate=new Intl.DateTimeFormat('zh-CN',{timeZone:'Asia/Shanghai',year:'numeric',month:'long',day:'numeric',weekday:'long'});
+  const now=new Date();document.querySelector('#asof').textContent='简报日期：'+fmtDate.format(now)+' · 北京时间';
+  function saveExtras(){const p=new URLSearchParams();if(customStocks.length)p.set('extra',customStocks.map(s=>s.exchange==='NASDAQ'?s.ticker:`${s.exchange}:${s.ticker}`).join(','));history.replaceState({},'',location.pathname+(p.size?'?'+p.toString():''))}
+  function renderStocks(){stocks=[...defaultStocks,...customStocks].slice(0,20);const cards=document.querySelector('#stocks');cards.replaceChildren();for(const stock of stocks){const [ticker,name,exchange]=Array.isArray(stock)?stock:[stock.ticker,stock.name,stock.exchange];const card=document.createElement('article');card.className='stock';const top=document.createElement('div');top.className='stock-top';const symbol=document.createElement('b');symbol.textContent=ticker;const label=document.createElement('span');label.textContent=name;top.append(symbol,label);card.append(top);const p=document.createElement('p');p.textContent=snapshots[ticker]||'已加入观察：行情与中文新闻自动纳入；尚无可核实的未来事件日期。';card.append(p);const link=document.createElement('a');link.href=`https://www.tradingview.com/symbols/${exchange}-${ticker}/news/`;link.target='_blank';link.rel='noopener';link.textContent='相关新闻 ↗';card.append(link);if(customStocks.some(s=>s.ticker===ticker)){const remove=document.createElement('button');remove.className='remove-stock';remove.textContent='移除此项';remove.onclick=()=>{customStocks=customStocks.filter(s=>s.ticker!==ticker);saveExtras();renderStocks();renderTape();loadNews()};card.append(remove)}cards.append(card)}}
+  renderStocks();
+  const today=new Date(new Intl.DateTimeFormat('en-CA',{timeZone:'Asia/Shanghai',year:'numeric',month:'2-digit',day:'2-digit'}).format(now)+'T00:00:00+08:00');
+  document.querySelector('#events').innerHTML=events.map(([ticker,title,date])=>{const day=new Date(date+'T00:00:00+08:00');const left=Math.ceil((day-today)/86400000);const label=left<0?'已结束':left===0?'今天':`还有 ${left} 天`;return `<article class="event"><div class="days">${label}</div><div class="name">${ticker} · ${title}</div><div class="date">${date.replaceAll('-','/')}</div></article>`}).join('');
+  function renderTape(){const tape=document.createElement('tv-ticker-tape');const symbols=stocks.map(stock=>Array.isArray(stock)?`${stock[2]}:${stock[0]}`:`${stock.exchange}:${stock.ticker}`);symbols.push('AMEX:SPY','NASDAQ:QQQ');tape.setAttribute('symbols',symbols.join(','));tape.setAttribute('item-size','compact');const target=document.querySelector('#tape');target.replaceChildren(tape)}
+  renderTape();
+  const industryTape=document.createElement('tv-ticker-tape');industryTape.setAttribute('symbols','NASDAQ:SOXX,AMEX:IGV,AMEX:DRIV,AMEX:XLF,AMEX:XLB,AMEX:XLV');industryTape.setAttribute('item-size','compact');document.querySelector('#industry-tape').append(industryTape);
+  function say(msg){const el=document.querySelector('#toast');el.textContent=msg;el.classList.add('show');setTimeout(()=>el.classList.remove('show'),2200)}
+  document.querySelector('#refresh').onclick=()=>location.reload();
+  document.querySelector('#share').onclick=async()=>{try{await navigator.clipboard.writeText(location.href);say('网页链接已复制')}catch{say('请复制浏览器地址栏里的链接')}};
+  async function loadNews(){const list=document.querySelector('#news'),status=document.querySelector('#news-status');try{const symbols=stocks.map(s=>Array.isArray(s)?s[0]:s.ticker);const res=await fetch('/api/news?tickers='+symbols.join(','));const data=await res.json();if(!res.ok)throw new Error(data.error||'新闻服务暂不可用');list.replaceChildren();if(!data.articles?.length){list.innerHTML='<div class="empty" style="grid-column:1/-1">暂时没有找到相关新闻。</div>';return}status.textContent=`${data.articles.length} 条`;
+    for(const item of data.articles){const article=document.createElement('article');article.className='news-item';const link=document.createElement('a');link.href=item.url;link.target='_blank';link.rel='noopener';link.textContent=item.titleZh||item.title;article.append(link);if(item.summaryZh){const p=document.createElement('p');p.textContent=item.summaryZh;article.append(p)}const meta=document.createElement('div');meta.className='news-meta';const dt=item.publishedAt?new Date(item.publishedAt).toLocaleString('zh-CN',{timeZone:'Asia/Shanghai',month:'2-digit',day:'2-digit',hour:'2-digit',minute:'2-digit'}):'';meta.textContent=[item.ticker,item.source,dt].filter(Boolean).join(' · ');article.append(meta);list.append(article)}
+  }catch(e){status.textContent='';list.innerHTML=`<div class="empty" style="grid-column:1/-1">${location.protocol==='file:'?'本地预览不支持新闻翻译；部署网页并配置新闻翻译服务后可用。':e.message}</div>`}}
+  function addStocks(){const input=document.querySelector('#add-symbols');const raw=input.value.split(/[\s,，]+/).filter(Boolean);if(!raw.length){say('请输入股票代码');return}const parsed=raw.map(parseStock);if(parsed.some(s=>!s)){say('代码格式无效；可用 NASDAQ: 或 NYSE: 指定交易所');return}const known=new Set([...defaultStocks.map(s=>s[0]),...customStocks.map(s=>s.ticker)]);const added=[...new Map(parsed.filter(s=>!known.has(s.ticker)).map(s=>[s.ticker,s])).values()];if(stocks.length+added.length>20){say('最多跟踪 20 只股票');return}if(!added.length){say('这些代码已经在清单中');return}customStocks=[...customStocks,...added];input.value='';saveExtras();renderStocks();renderTape();loadNews();say(`已添加 ${added.length} 只股票`)}
+  document.querySelector('#add-symbols-button').onclick=addStocks;
+  document.querySelector('#add-symbols').addEventListener('keydown',e=>{if(e.key==='Enter')addStocks()});
+
+  const ledgerKey='us-stock-watch-ledger-v1';
+  const ledgerMoney=new Intl.NumberFormat('en-US',{style:'currency',currency:'USD',maximumFractionDigits:2});
+  const ledgerQty=new Intl.NumberFormat('en-US',{maximumFractionDigits:6});
+  let ledger=[];
+  try{const saved=JSON.parse(localStorage.getItem(ledgerKey)||'[]');if(Array.isArray(saved))ledger=saved.filter(t=>t&&/^[A-Z][A-Z0-9.\-]{0,9}$/.test(t.ticker)&&['BUY','SELL'].includes(t.side)&&Number.isFinite(+t.qty)&&+t.qty>0&&Number.isFinite(+t.price)&&+t.price>0&&Number.isFinite(+t.fee)&&+t.fee>=0&&/^\d{4}-\d{2}-\d{2}$/.test(t.date))}catch{ledger=[]}
+  function persistLedger(){try{localStorage.setItem(ledgerKey,JSON.stringify(ledger));return true}catch{return false}}
+  function calculateLedger(items){const positions=new Map(),realized=new Map(),ordered=[...items].sort((a,b)=>a.date.localeCompare(b.date)||(+a.createdAt||0)-(+b.createdAt||0));for(const trade of ordered){let pos=positions.get(trade.ticker);if(!pos){pos={ticker:trade.ticker,qty:0,cost:0,realized:0};positions.set(trade.ticker,pos)}const qty=+trade.qty,price=+trade.price,fee=+trade.fee;if(trade.side==='BUY'){pos.qty+=qty;pos.cost+=qty*price+fee}else{if(qty>pos.qty+1e-8)return{error:`${trade.ticker} 在 ${trade.date} 的卖出股数超过此前持仓。`,positions,realized};const basis=pos.qty?pos.cost/pos.qty*qty:0;const profit=qty*price-fee-basis;pos.qty-=qty;pos.cost-=basis;if(pos.qty<1e-8){pos.qty=0;pos.cost=0}pos.realized+=profit;realized.set(trade.id,profit)}}return{positions,realized}}
+  function addLedgerCell(row,text,className=''){const cell=document.createElement('td');cell.textContent=text;if(className)cell.className=className;row.append(cell);return cell}
+  function renderLedger(){const result=calculateLedger(ledger);const positions=[...result.positions.values()];const open=positions.filter(p=>p.qty>0);const openCost=open.reduce((sum,p)=>sum+p.cost,0);const totalRealized=positions.reduce((sum,p)=>sum+p.realized,0);const summary=document.querySelector('#ledger-summary');summary.replaceChildren();for(const [label,value] of [['持有标的',`${open.length} 只`],['持仓成本',ledgerMoney.format(openCost)],['已实现盈亏',ledgerMoney.format(totalRealized)],['历史交易',`${ledger.length} 笔`]]){const box=document.createElement('div');box.className='metric';const caption=document.createElement('span');caption.textContent=label;const amount=document.createElement('b');amount.textContent=value;if(label==='已实现盈亏')amount.style.color=totalRealized<0?'var(--red)':'var(--green)';box.append(caption,amount);summary.append(box)}
+    const holdings=document.querySelector('#ledger-holdings');holdings.replaceChildren();if(!positions.length){holdings.innerHTML='<div class="ledger-empty">还没有持仓记录</div>'}else{const wrap=document.createElement('div');wrap.className='ledger-table-wrap';const table=document.createElement('table');table.className='ledger-table';const thead=document.createElement('thead'),head=document.createElement('tr');for(const label of ['代码','持有股数','平均成本','持仓成本','已实现盈亏']){const th=document.createElement('th');th.textContent=label;head.append(th)}thead.append(head);table.append(thead);const body=document.createElement('tbody');for(const p of positions){const row=document.createElement('tr');addLedgerCell(row,p.ticker);addLedgerCell(row,ledgerQty.format(p.qty));addLedgerCell(row,ledgerMoney.format(p.qty?p.cost/p.qty:0));addLedgerCell(row,ledgerMoney.format(p.cost));const profit=addLedgerCell(row,ledgerMoney.format(p.realized),p.realized<0?'sell':'buy');body.append(row)}table.append(body);wrap.append(table);holdings.append(wrap)}
+    const history=document.querySelector('#ledger-history');history.replaceChildren();document.querySelector('#ledger-count').textContent=`${ledger.length} 笔`;if(!ledger.length){history.innerHTML='<div class="ledger-empty">买入或卖出后，交易会保存在这里</div>'}else{const table=document.createElement('table');table.className='ledger-table';const head=document.createElement('thead'),hr=document.createElement('tr');for(const label of ['日期','代码','方向','股数','成交价','手续费','成交金额','已实现盈亏','']){const th=document.createElement('th');th.textContent=label;hr.append(th)}head.append(hr);table.append(head);const body=document.createElement('tbody');const rows=[...ledger].sort((a,b)=>b.date.localeCompare(a.date)||(+b.createdAt||0)-(+a.createdAt||0));for(const trade of rows){const row=document.createElement('tr');addLedgerCell(row,trade.date);addLedgerCell(row,trade.ticker);addLedgerCell(row,trade.side==='BUY'?'买入':'卖出',trade.side==='BUY'?'buy':'sell');addLedgerCell(row,ledgerQty.format(+trade.qty));addLedgerCell(row,ledgerMoney.format(+trade.price));addLedgerCell(row,ledgerMoney.format(+trade.fee));addLedgerCell(row,ledgerMoney.format(+trade.qty*+trade.price));addLedgerCell(row,trade.side==='SELL'?ledgerMoney.format(result.realized.get(trade.id)||0):'—',trade.side==='SELL'?((result.realized.get(trade.id)||0)<0?'sell':'buy'):'');const action=addLedgerCell(row,'');const del=document.createElement('button');del.type='button';del.textContent='删除';del.setAttribute('aria-label',`删除 ${trade.date} ${trade.ticker} 交易`);del.onclick=()=>{const next=ledger.filter(t=>t.id!==trade.id);const checked=calculateLedger(next);if(checked.error){say('请先删除依赖此买入记录的卖出记录');return}ledger=next;persistLedger();renderLedger()};action.append(del);body.append(row)}table.append(body);const wrap=document.createElement('div');wrap.className='ledger-table-wrap';wrap.append(table);history.append(wrap)}
+    const symbols=[...new Set([...defaultStocks.map(s=>s[0]),...customStocks.map(s=>s.ticker),...ledger.map(t=>t.ticker)])];document.querySelector('#ledger-ticker-options').innerHTML=symbols.map(s=>`<option value="${s}"></option>`).join('')}
+  const dateParts=new Intl.DateTimeFormat('en-CA',{timeZone:'Asia/Shanghai',year:'numeric',month:'2-digit',day:'2-digit'}).formatToParts(new Date());document.querySelector('#ledger-date').value=`${dateParts.find(p=>p.type==='year').value}-${dateParts.find(p=>p.type==='month').value}-${dateParts.find(p=>p.type==='day').value}`;
+  document.querySelector('#ledger-form').addEventListener('submit',event=>{event.preventDefault();const raw=document.querySelector('#ledger-ticker').value;const parsed=parseStock(raw);if(!parsed){say('请输入有效股票代码');return}const trade={id:`${Date.now()}-${Math.random().toString(36).slice(2,8)}`,createdAt:Date.now(),ticker:parsed.ticker,side:document.querySelector('#ledger-side').value,qty:Number(document.querySelector('#ledger-qty').value),price:Number(document.querySelector('#ledger-price').value),fee:Number(document.querySelector('#ledger-fee').value||0),date:document.querySelector('#ledger-date').value};if(!trade.date||!Number.isFinite(trade.qty)||trade.qty<=0||!Number.isFinite(trade.price)||trade.price<=0||!Number.isFinite(trade.fee)||trade.fee<0||!Number.isFinite(trade.qty*trade.price+trade.fee)){say('请检查股数、价格、手续费和日期');return}const next=[...ledger,trade];const result=calculateLedger(next);if(result.error){say(result.error);return}ledger=next;if(!persistLedger())say('浏览器无法保存记录；请检查存储空间或隐私设置');document.querySelector('#ledger-form').reset();document.querySelector('#ledger-date').value=trade.date;document.querySelector('#ledger-fee').value='0';renderLedger()});
+  renderLedger();
+  loadNews();
+</script>
+</body>
+</html>

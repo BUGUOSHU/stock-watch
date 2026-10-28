@@ -162,6 +162,6 @@ export async function onRequestGet({ request, env, ctx }) {
     return response;
   } catch (error) {
     console.error('News fetch or translation failed:', error);
-    return json({ error: '新闻获取或中文翻译暂时失败，请稍后刷新。' }, 502, { 'Cache-Control': 'no-store' });
+    return json({ error: '新闻获取或中文翻译暂时失败，请稍后刷新。', ...(url.searchParams.get('debug') === '1' ? { diagnostics: { name: String(error?.name || ''), message: String(error?.message || error).slice(0, 500) } } : {}) }, 502, { 'Cache-Control': 'no-store' });
   }
 }

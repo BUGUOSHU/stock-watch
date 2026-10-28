@@ -2,6 +2,12 @@ const MAX_TICKERS = 20;
 const ARTICLES_PER_TICKER = 2;
 const ARTICLES_PER_TOPIC = 2;
 const AI_MODEL = '@cf/meta/llama-3.1-8b-instruct-fast';
+const STOCK_SEARCH_NAMES = {
+  TSLA: 'Tesla', ORCL: 'Oracle', KLAC: 'KLA Corporation', LRCX: 'Lam Research',
+  CRDO: 'Credo Technology', COHR: 'Coherent Corp', AMKR: 'Amkor Technology',
+  SOFI: 'SoFi Technologies', PONY: 'Pony.ai', SOUN: 'SoundHound AI',
+  DOW: 'Dow Inc', NVO: 'Novo Nordisk',
+};
 const MACRO_FEEDS = [
   ['美国政策与经济', 'https://feeds.bbci.co.uk/news/world/us_and_canada/rss.xml'],
   ['宏观经济与市场', 'https://feeds.bbci.co.uk/news/business/rss.xml'],
@@ -30,10 +36,21 @@ function tag(item, name) {
   return match ? cleanText(match[1]) : '';
 }
 
+function articleUrl(rawUrl) {
+  try {
+    const url = new URL(rawUrl);
+    if (url.hostname.endsWith('bing.com') && url.pathname.includes('apiclick.aspx')) {
+      const original = url.searchParams.get('url');
+      if (original) return original;
+    }
+    if (url.protocol === 'http:') url.protocol = 'https:';
+    return url.toString();
+  } catch { return ''; }
+}
+
 async function fetchFeed(feedUrl, { ticker = '', topic = '' } = {}) {
-  const url = ticker
-    ? `https://feeds.finance.yahoo.com/rss/2.0/headline?s=${encodeURIComponent(ticker)}&region=US&lang=en-US`
-    : feedUrl;
+  const search = new URLSearchParams({ q: `${STOCK_SEARCH_NAMES[ticker] || ticker} ${ticker} stock`, format: 'rss', mkt: 'en-US' });
+  const url = ticker ? `https://www.bing.com/news/search?${search}` : feedUrl;
   const response = await fetch(url, {
     headers: { 'User-Agent': 'Mozilla/5.0 (compatible; StockWatch/1.0; +https://stock-watch-c4r.pages.dev/)' },
     signal: AbortSignal.timeout(12000),
@@ -44,10 +61,10 @@ async function fetchFeed(feedUrl, { ticker = '', topic = '' } = {}) {
     .slice(0, ticker ? ARTICLES_PER_TICKER : ARTICLES_PER_TOPIC)
     .map(([_, item]) => {
       const title = tag(item, 'title');
-      const link = tag(item, 'link');
+      const link = articleUrl(tag(item, 'link'));
       const description = tag(item, 'description');
       const publishedAt = tag(item, 'pubDate');
-      const source = tag(item, 'source') || (ticker ? 'Yahoo Finance' : 'BBC News');
+      const source = tag(item, 'News:Source') || tag(item, 'source') || (ticker ? 'Bing News' : 'BBC News');
       return {
         id: `${ticker || topic}-${link}`,
         ...(ticker ? { ticker, category: 'stock' } : { topic, category: 'macro' }),
@@ -58,7 +75,9 @@ async function fetchFeed(feedUrl, { ticker = '', topic = '' } = {}) {
         publishedAt,
       };
     })
-    .filter(item => item.title && /^https?:\/\//i.test(item.url));
+    .filter(item => item.title && /^https?:\/\//i.test(item.url) && (!Date.parse(item.publishedAt) || Date.now() - Date.parse(item.publishedAt) <= 3 * 86400000))
+    .sort((a, b) => Date.parse(b.publishedAt || 0) - Date.parse(a.publishedAt || 0))
+    .slice(0, ticker ? ARTICLES_PER_TICKER : ARTICLES_PER_TOPIC);
 }
 
 async function fetchBatches(requests, batchSize = 5) {
@@ -146,17 +165,16 @@ export async function onRequestGet({ request, env, ctx }) {
   ];
 
   try {
-    const { items: fetched, errors: feedErrors, completed: feedsCompleted } = await fetchBatches(requests);
+    const { items: fetched } = await fetchBatches(requests);
     const unique = [...new Map(fetched.map(item => [item.url, item])).values()]
       .sort((a, b) => Date.parse(b.publishedAt || 0) - Date.parse(a.publishedAt || 0));
-    if (!unique.length) return json({ articles: [], macroArticles: [], ...(url.searchParams.get('debug') === '1' ? { diagnostics: { requestedFeeds: requests.length, completedFeeds: feedsCompleted, articleCount: 0, feedErrors } } : {}) });
+    if (!unique.length) return json({ articles: [], macroArticles: [] });
     const translations = await translateAndClassify(unique, env.AI);
     const translatedById = new Map(translations.map(item => [item.id, item]));
     const articles = unique.map(item => ({ ...item, ...(translatedById.get(item.id) || {}) }));
     const body = {
       articles: articles.filter(item => item.category === 'stock'),
       macroArticles: articles.filter(item => item.category === 'macro'),
-      ...(url.searchParams.get('debug') === '1' ? { diagnostics: { requestedFeeds: requests.length, completedFeeds: feedsCompleted, articleCount: unique.length, feedErrors } } : {}),
     };
     const response = json(body);
     await cache.put(cacheKey, response.clone());

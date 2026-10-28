@@ -1,7 +1,7 @@
 const MAX_TICKERS = 20;
 const ARTICLES_PER_TICKER = 2;
 const ARTICLES_PER_TOPIC = 2;
-const AI_MODEL = '@cf/meta/llama-3.1-8b-instruct';
+const AI_MODEL = '@cf/meta/llama-3.1-8b-instruct-fast';
 const MACRO_FEEDS = [
   ['美国政策与经济', 'https://feeds.bbci.co.uk/news/world/us_and_canada/rss.xml'],
   ['宏观经济与市场', 'https://feeds.bbci.co.uk/news/business/rss.xml'],
@@ -162,6 +162,6 @@ export async function onRequestGet({ request, env, ctx }) {
     return response;
   } catch (error) {
     console.error('News fetch or translation failed:', error);
-    return json({ error: '新闻获取或中文翻译暂时失败，请稍后刷新。', ...(url.searchParams.get('debug') === '1' ? { diagnostics: { name: String(error?.name || ''), message: String(error?.message || error).slice(0, 500) } } : {}) }, 502, { 'Cache-Control': 'no-store' });
+    return json({ error: '新闻获取或中文翻译暂时失败，请稍后刷新。' }, 502, { 'Cache-Control': 'no-store' });
   }
 }

@@ -61,12 +61,21 @@ async function fetchFeed(query, { ticker = '', topic = '' } = {}) {
 }
 
 async function fetchBatches(requests, batchSize = 5) {
-  const results = [];
+  const items = [];
+  const errors = [];
+  let completed = 0;
   for (let start = 0; start < requests.length; start += batchSize) {
     const batch = await Promise.allSettled(requests.slice(start, start + batchSize).map(run => run()));
-    results.push(...batch.flatMap(result => result.status === 'fulfilled' ? result.value : []));
+    for (const result of batch) {
+      if (result.status === 'fulfilled') {
+        completed += 1;
+        items.push(...result.value);
+      } else {
+        errors.push(String(result.reason?.message || result.reason));
+      }
+    }
   }
-  return results;
+  return { items, errors, completed };
 }
 
 function json(body, status = 200, extraHeaders = {}) {
@@ -136,15 +145,24 @@ export async function onRequestGet({ request, env, ctx }) {
   ];
 
   try {
-    const fetched = await fetchBatches(requests);
+    const { items: fetched, errors: feedErrors, completed: feedsCompleted } = await fetchBatches(requests);
     const unique = [...new Map(fetched.map(item => [item.url, item])).values()]
       .sort((a, b) => Date.parse(b.publishedAt || 0) - Date.parse(a.publishedAt || 0));
+    if (!unique.length) {
+      const diagnostics = url.searchParams.get('debug') === '1'
+        ? { diagnostics: { requestedFeeds: requests.length, completedFeeds: feedsCompleted, articleCount: 0, feedErrors } }
+        : {};
+      return json({ articles: [], macroArticles: [], ...diagnostics });
+    }
     const translations = await translateAndClassify(unique, env.AI);
     const translatedById = new Map(translations.map(item => [item.id, item]));
     const articles = unique.map(item => ({ ...item, ...(translatedById.get(item.id) || {}) }));
     const body = {
       articles: articles.filter(item => item.category === 'stock'),
       macroArticles: articles.filter(item => item.category === 'macro'),
+      ...(url.searchParams.get('debug') === '1'
+        ? { diagnostics: { requestedFeeds: requests.length, completedFeeds: feedsCompleted, articleCount: unique.length, feedErrors } }
+        : {}),
     };
     const response = json(body);
     await cache.put(cacheKey, response.clone());

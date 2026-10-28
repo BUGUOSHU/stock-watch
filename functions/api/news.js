@@ -151,6 +151,7 @@ export async function onRequestGet({ request, env, ctx }) {
     return response;
   } catch (error) {
     console.error('News fetch or translation failed:', error);
-    return json({ error: '新闻获取或中文翻译暂时失败，请稍后刷新。' }, 502, { 'Cache-Control': 'no-store' });
+    const detail = url.searchParams.get('debug') === '1' ? String(error?.message || error) : undefined;
+    return json({ error: '新闻获取或中文翻译暂时失败，请稍后刷新。', ...(detail ? { detail } : {}) }, 502, { 'Cache-Control': 'no-store' });
   }
 }

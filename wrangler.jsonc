@@ -5,12 +5,5 @@
   "pages_build_output_dir": ".",
   "ai": {
     "binding": "AI"
-  },
-  "observability": {
-    "enabled": true,
-    "logs": {
-      "invocation_logs": true,
-      "head_sampling_rate": 1
-    }
   }
 }

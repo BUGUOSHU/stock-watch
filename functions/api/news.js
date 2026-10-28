@@ -10,7 +10,7 @@ const MACRO_FEEDS = [
 ];
 
 function cleanText(value = '') {
-  return decodeXml(value.replace(/<[^>]*>/g, ' '))
+  return decodeXml(value).replace(/<[^>]*>/g, ' ')
     .replace(/\s+/g, ' ')
     .trim()
     .slice(0, 900);
@@ -146,17 +146,16 @@ export async function onRequestGet({ request, env, ctx }) {
   ];
 
   try {
-    const { items: fetched, errors: feedErrors, completed: feedsCompleted } = await fetchBatches(requests);
+    const { items: fetched } = await fetchBatches(requests);
     const unique = [...new Map(fetched.map(item => [item.url, item])).values()]
       .sort((a, b) => Date.parse(b.publishedAt || 0) - Date.parse(a.publishedAt || 0));
-    if (!unique.length) return json({ articles: [], macroArticles: [], ...(url.searchParams.get('debug') === '1' ? { diagnostics: { requestedFeeds: requests.length, completedFeeds: feedsCompleted, articleCount: 0, feedErrors } } : {}) });
+    if (!unique.length) return json({ articles: [], macroArticles: [] });
     const translations = await translateAndClassify(unique, env.AI);
     const translatedById = new Map(translations.map(item => [item.id, item]));
     const articles = unique.map(item => ({ ...item, ...(translatedById.get(item.id) || {}) }));
     const body = {
       articles: articles.filter(item => item.category === 'stock'),
       macroArticles: articles.filter(item => item.category === 'macro'),
-      ...(url.searchParams.get('debug') === '1' ? { diagnostics: { requestedFeeds: requests.length, completedFeeds: feedsCompleted, articleCount: unique.length, feedErrors } } : {}),
     };
     const response = json(body);
     await cache.put(cacheKey, response.clone());

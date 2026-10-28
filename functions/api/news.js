@@ -58,7 +58,6 @@ async function fetchFeed(feedUrl, { ticker = '', topic = '' } = {}) {
   if (!response.ok) throw new Error(`${ticker || topic} news source returned ${response.status}`);
   const xml = await response.text();
   return [...xml.matchAll(/<item(?:\s[^>]*)?>([\s\S]*?)<\/item>/gi)]
-    .slice(0, ticker ? ARTICLES_PER_TICKER : ARTICLES_PER_TOPIC)
     .map(([_, item]) => {
       const title = tag(item, 'title');
       const link = articleUrl(tag(item, 'link'));

@@ -2,12 +2,11 @@ const MAX_TICKERS = 20;
 const ARTICLES_PER_TICKER = 2;
 const ARTICLES_PER_TOPIC = 2;
 const AI_MODEL = '@cf/meta/llama-3.1-8b-instruct';
-const MACRO_TOPICS = [
-  ['美国国债、利率与经济数据', 'US Treasury yields Federal Reserve interest rates CPI inflation jobs report nonfarm payrolls when:2d'],
-  ['美国重大政策与市场', 'United States White House Congress major policy economy regulation markets when:2d'],
-  ['霍尔木兹海峡与地缘局势', 'Strait of Hormuz Iran Gulf shipping conflict oil when:2d'],
-  ['能源与全球供应链', 'oil prices energy supply chain geopolitics OPEC when:2d'],
-  ['AI、半导体与中美科技', 'AI semiconductor chips data centers US China technology export controls when:2d'],
+const MACRO_FEEDS = [
+  ['美国政策与经济', 'https://feeds.bbci.co.uk/news/world/us_and_canada/rss.xml'],
+  ['宏观经济与市场', 'https://feeds.bbci.co.uk/news/business/rss.xml'],
+  ['霍尔木兹海峡与地缘局势', 'https://feeds.bbci.co.uk/news/world/middle_east/rss.xml'],
+  ['AI、半导体与全球科技', 'https://feeds.bbci.co.uk/news/technology/rss.xml'],
 ];
 
 function cleanText(value = '') {
@@ -31,11 +30,13 @@ function tag(item, name) {
   return match ? cleanText(match[1]) : '';
 }
 
-async function fetchFeed(query, { ticker = '', topic = '' } = {}) {
-  const params = new URLSearchParams({ q: query, hl: 'en-US', gl: 'US', ceid: 'US:en' });
-  const response = await fetch(`https://news.google.com/rss/search?${params}`, {
-    headers: { 'User-Agent': 'StockWatch/1.0 (news headline translation)' },
-    signal: AbortSignal.timeout(7000),
+async function fetchFeed(feedUrl, { ticker = '', topic = '' } = {}) {
+  const url = ticker
+    ? `https://feeds.finance.yahoo.com/rss/2.0/headline?s=${encodeURIComponent(ticker)}&region=US&lang=en-US`
+    : feedUrl;
+  const response = await fetch(url, {
+    headers: { 'User-Agent': 'Mozilla/5.0 (compatible; StockWatch/1.0; +https://stock-watch-c4r.pages.dev/)' },
+    signal: AbortSignal.timeout(12000),
   });
   if (!response.ok) throw new Error(`News source returned ${response.status}`);
   const xml = await response.text();
@@ -46,7 +47,7 @@ async function fetchFeed(query, { ticker = '', topic = '' } = {}) {
       const link = tag(item, 'link');
       const description = tag(item, 'description');
       const publishedAt = tag(item, 'pubDate');
-      const source = tag(item, 'source');
+      const source = tag(item, 'source') || (ticker ? 'Yahoo Finance' : 'BBC News');
       return {
         id: `${ticker || topic}-${link}`,
         ...(ticker ? { ticker, category: 'stock' } : { topic, category: 'macro' }),
@@ -140,29 +141,21 @@ export async function onRequestGet({ request, env, ctx }) {
   const raw = url.searchParams.get('tickers') || '';
   const tickers = [...new Set(raw.toUpperCase().split(/[\s,]+/).filter(ticker => /^[A-Z][A-Z0-9.\-]{0,9}$/.test(ticker)))].slice(0, MAX_TICKERS);
   const requests = [
-    ...tickers.map(ticker => () => fetchFeed(`${ticker} stock when:2d`, { ticker })),
-    ...MACRO_TOPICS.map(([topic, query]) => () => fetchFeed(query, { topic })),
+    ...tickers.map(ticker => () => fetchFeed('', { ticker })),
+    ...MACRO_FEEDS.map(([topic, feedUrl]) => () => fetchFeed(feedUrl, { topic })),
   ];
 
   try {
-    const { items: fetched, errors: feedErrors, completed: feedsCompleted } = await fetchBatches(requests);
+    const { items: fetched } = await fetchBatches(requests);
     const unique = [...new Map(fetched.map(item => [item.url, item])).values()]
       .sort((a, b) => Date.parse(b.publishedAt || 0) - Date.parse(a.publishedAt || 0));
-    if (!unique.length) {
-      const diagnostics = url.searchParams.get('debug') === '1'
-        ? { diagnostics: { requestedFeeds: requests.length, completedFeeds: feedsCompleted, articleCount: 0, feedErrors } }
-        : {};
-      return json({ articles: [], macroArticles: [], ...diagnostics });
-    }
+    if (!unique.length) return json({ articles: [], macroArticles: [] });
     const translations = await translateAndClassify(unique, env.AI);
     const translatedById = new Map(translations.map(item => [item.id, item]));
     const articles = unique.map(item => ({ ...item, ...(translatedById.get(item.id) || {}) }));
     const body = {
       articles: articles.filter(item => item.category === 'stock'),
       macroArticles: articles.filter(item => item.category === 'macro'),
-      ...(url.searchParams.get('debug') === '1'
-        ? { diagnostics: { requestedFeeds: requests.length, completedFeeds: feedsCompleted, articleCount: unique.length, feedErrors } }
-        : {}),
     };
     const response = json(body);
     await cache.put(cacheKey, response.clone());

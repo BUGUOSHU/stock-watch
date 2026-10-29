@@ -158,11 +158,13 @@ async function translateAndClassify(articles, AI) {
 
 export async function onRequestGet({ request, env, ctx }) {
   const url = new URL(request.url);
+  const forceRefresh = url.searchParams.has('refresh');
   const cacheUrl = new URL(url);
   cacheUrl.searchParams.delete('refresh');
+  cacheUrl.searchParams.set('cacheVersion', '2');
   const cacheKey = new Request(cacheUrl.toString(), request);
   const cache = caches.default;
-  const cached = await cache.match(cacheKey);
+  const cached = forceRefresh ? null : await cache.match(cacheKey);
   if (cached) return cached;
 
   if (!env.AI) return json({ error: 'Cloudflare Workers AI 尚未绑定，请在 Pages 项目中添加名为 AI 的 Workers AI binding。' }, 503);
